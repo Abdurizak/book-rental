@@ -45,7 +45,7 @@ export default function Register() {
           />
         </div>
 
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <label className="block text-white text-sm font-medium mb-2" htmlFor="grade">Grade</label>
           <input
             className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -56,7 +56,7 @@ export default function Register() {
             onChange={(e) => setGrade(e.target.value)}
             required
           />
-        </div>
+        </div> */}
 
         <div className="mb-4">
           <label className="block text-white text-sm font-medium mb-2" htmlFor="email">Email</label>
