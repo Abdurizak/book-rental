@@ -119,19 +119,19 @@ function Home() {
             <h3 className="text-2xl font-bold text-gray-900 text-center">The Numbers</h3>
             <div className="mt-6 grid grid-cols-2 gap-8 sm:grid-cols-4 max-w-4xl mx-auto">
               <div className="text-center">
-                <p className="text-4xl font-bold text-gray-900">$50M</p>
+                <p className="text-4xl font-bold text-gray-900">$8M</p>
                 <p className="mt-1 text-gray-600">Books</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-gray-900">27.5K</p>
+                <p className="text-4xl font-bold text-gray-900">2M</p>
                 <p className="mt-1 text-gray-600">Subscribers</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-gray-900">25.4M</p>
+                <p className="text-4xl font-bold text-gray-900">5.4M</p>
                 <p className="mt-1 text-gray-600">Borrowed Books</p>
               </div>
               <div className="text-center">
-                <p className="text-4xl font-bold text-gray-900">120M</p>
+                <p className="text-4xl font-bold text-gray-900">3.8M</p>
                 <p className="mt-1 text-gray-600">Guests and Members</p>
               </div>
             </div>
