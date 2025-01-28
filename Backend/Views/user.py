@@ -58,9 +58,9 @@ def add_users():
     # Send Welcome Email
     try:
         msg = Message(
-            subject="Welcome to Muthokinju",
+            subject="Welcome to Heaven Of Pages",
             recipients=[email],
-            body="confirm if you got the email by sending the word penzi to 224055",
+            body="Welcome to the Heaven of Pages Library! Your journey into the world of stories, knowledge, and adventures begins here. Happy reading!",
         )
       
         mail.send(msg)

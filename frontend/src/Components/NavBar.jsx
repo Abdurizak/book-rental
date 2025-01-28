@@ -4,10 +4,14 @@ import React from 'react';
 const Navbar = () => {
   return (
     <>
-      <nav className=" p-4 flex justify-between items-center">
-        {/* Left Side: Logo */}
-        <div className="flex items-center space-x-4">
-          <img src="https://images.unsplash.com/photo-1556360853-5c1e1b64ff6a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGxpYnJhcnklMjBsb2dvfGVufDB8fDB8fHww" alt="Logo" className="h-12" />
+      <nav className="p-4 flex justify-between items-center">
+        {/* Left Side: Logo with increased spacing */}
+        <div className="flex items-center mr-12"> {/* Added right margin for spacing */}
+          <img 
+            src="https://images.unsplash.com/photo-1615915468538-0fbd857888ca?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjZ8fGxpYnJhcnklMjBsb2dvfGVufDB8fDB8fHww" 
+            alt="Logo" 
+            className="h-20 w-20 rounded-full object-cover mx-4" // Increased size and added margins
+          />
         </div>
 
         {/* Centered Library Name */}

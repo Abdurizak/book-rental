@@ -30,9 +30,9 @@ function Home() {
           Meet Our Leadership
         </h2>
         <p className="mt-6 text-lg text-gray-600 max-w-2xl mx-auto">
-        We are a passionate and dedicated team, united by our love for books and our commitment to providing exceptional service. 
-        Each member brings unique expertise and enthusiasm, working collaboratively to create the best possible experience for our library community. 
-        Our shared goal is to inspire, educate, and make a positive impact through the power of books.
+          We are a passionate and dedicated team, united by our love for books and our commitment to providing exceptional service. 
+          Each member brings unique expertise and enthusiasm, working collaboratively to create the best possible experience for our library community. 
+          Our shared goal is to inspire, educate, and make a positive impact through the power of books.
         </p>
       </div>
 
@@ -41,10 +41,14 @@ function Home() {
         <ul role="list" className="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:grid-cols-4">
           {people.map((person) => (
             <li key={person.name}>
-              <div className="flex items-center gap-x-6">
-                <img alt={person.name} src={person.imageUrl} className="h-16 w-16 rounded-full" />
-                <div>
-                  <h3 className="text-base font-semibold tracking-tight text-gray-900">{person.name}</h3>
+              <div className="flex flex-col items-center gap-y-4"> {/* Changed to flex-col for vertical alignment */}
+                <img
+                  alt={person.name}
+                  src={person.imageUrl}
+                  className="h-32 w-32 rounded-full object-cover" // Increased size to h-32 w-32
+                />
+                <div className="text-center"> {/* Centered text */}
+                  <h3 className="text-lg font-semibold tracking-tight text-gray-900">{person.name}</h3>
                   <p className="text-sm font-semibold text-indigo-600">{person.role}</p>
                 </div>
               </div>
@@ -58,14 +62,14 @@ function Home() {
         <div className="max-w-full mx-auto px-8 lg:px-8">
           {/* Header Section */}
           <div className="max-w-3xl mx-auto text-center">
-            <p className="text-sm font-semibold text-indigo-600">About Us</p>
+            <p className="text-2xl font-bold text-black">About Us</p>
             <h2 className="text-4xl font-semi-bold tracking-tight text-gray-900 sm:text-4xl">
               On a Mission to Empower Remote Teams
             </h2>
             <p className="mt-4 text-xl text-gray-600">
-            At Heaven of Pages, we believe in the power of knowledge, collaboration, and seamless communication. 
-            Our mission is to empower remote teams by providing them with the resources they need to stay connected, engaged, and productive, no matter where they are. 
-            By curating a vast collection of books and resources, we aim to support personal and professional growth for individuals working in dynamic, remote environments.
+              At Heaven of Pages, we believe in the power of knowledge, collaboration, and seamless communication. 
+              Our mission is to empower remote teams by providing them with the resources they need to stay connected, engaged, and productive, no matter where they are. 
+              By curating a vast collection of books and resources, we aim to support personal and professional growth for individuals working in dynamic, remote environments.
             </p>
           </div>
 
@@ -75,15 +79,15 @@ function Home() {
             <div className="text-center">
               <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
               <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-              Our mission is to revolutionize the way remote teams access knowledge and stay connected. 
-              We strive to make learning and development accessible to everyone, regardless of location. 
-              By offering a diverse range of books and digital content, we aim to nurture a culture of continuous learning and collaboration within remote teams.
+                Our mission is to revolutionize the way remote teams access knowledge and stay connected. 
+                We strive to make learning and development accessible to everyone, regardless of location. 
+                By offering a diverse range of books and digital content, we aim to nurture a culture of continuous learning and collaboration within remote teams.
               </p>
               <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-              At Heaven of Pages, we are a team of book lovers and remote work enthusiasts who understand the challenges of staying connected and motivated in a virtual world. 
-              Our goal is to provide remote teams with the tools they need to grow, learn, and succeed together. 
-              From insightful books on team collaboration to guides for personal development, we are here to support the journey of every remote professional. 
-              Through our carefully curated collection, we strive to inspire, educate, and foster a thriving remote work culture.
+                At Heaven of Pages, we are a team of book lovers and remote work enthusiasts who understand the challenges of staying connected and motivated in a virtual world. 
+                Our goal is to provide remote teams with the tools they need to grow, learn, and succeed together. 
+                From insightful books on team collaboration to guides for personal development, we are here to support the journey of every remote professional. 
+                Through our carefully curated collection, we strive to inspire, educate, and foster a thriving remote work culture.
               </p>
             </div>
 
