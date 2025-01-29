@@ -1,5 +1,5 @@
 from flask import jsonify, request, Blueprint
-from models import db, User
+from models import db, User, Rental, Book
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_mail import Message
@@ -120,3 +120,46 @@ def delete_users(user_id):
 
     else:
         return jsonify({"error":"User your are trying to delete doesn't exist!"}),406
+
+
+@user_bp.route("/user/resetpassword/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    user = User.verify_reset_token(token)
+
+    if not user:
+        return jsonify({"error": "Token is invalid or expired"}), 401
+
+    if request.method == "POST":
+        data = request.get_json()
+        new_password = data.get("new_password")
+
+        if not new_password:
+            return jsonify({"error": "New password is required"}), 400
+
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
+        return jsonify({"success": "Password reset successfully"}), 200
+
+    return jsonify({"message": "Reset password form"}), 200
+
+@user_bp.route("/user/return-book/<int:rental_id>", methods=["POST"])
+@jwt_required()
+def return_rented_book(rental_id):
+    current_user_id = get_jwt_identity()
+    rental = Rental.query.filter_by(id=rental_id, user_id=current_user_id, status="Rented").first()
+
+    if not rental:
+        return jsonify({"error": "Rental record not found or book already returned"}), 404
+
+    # Mark as returned and set the return date
+    rental.status = "Returned"
+    rental.returned_at = datetime.utcnow()
+
+    # Optionally, update the book's availability
+    book = Book.query.get(rental.book_id)
+    if book:
+        book.available = True  # Assuming `available` is a column in the Book model
+
+    db.session.commit()
+    
+    return jsonify({"success": "Book returned successfully"}), 200
