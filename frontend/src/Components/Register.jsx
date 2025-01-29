@@ -29,7 +29,7 @@ export default function Register() {
     <div className="flex justify-center items-center min-h-screen bg-blue-100">
       <form className="bg-blue-500 p-8 rounded-lg shadow-lg max-w-md w-full" onSubmit={handleSubmit}>
         <p className="text-white text-3xl font-semibold mb-4 text-center">Register</p>
-        <p className="text-white text-sm mb-6 text-center">Signup now and get full access to our app.</p>
+        <p className="text-white text-sm mb-6 text-center">Signup now and get to dive into your favourite books.</p>
         {message && <p className="text-white text-center mb-4">{message}</p>}
         
         <div className="mb-4">

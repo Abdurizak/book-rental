@@ -1,5 +1,6 @@
 import { Outlet, Link } from "react-router-dom";
-import React from 'react';
+import React from "react";
+import SearchButton from "./SearchButton"; // Import the SearchButton component
 
 const Navbar = () => {
   return (
@@ -24,6 +25,12 @@ const Navbar = () => {
               Home
             </Link>
           </li>
+          
+          {/* Add the SearchButton Component */}
+          <li className="nav-item">
+            <SearchButton /> {/* This will render the functional search button */}
+          </li>
+          
           <li className="nav-item">
             <Link className="nav-link active text-black hover:bg-blue-600 px-4 py-2 rounded transition-colors duration-300" to="/Login">
               Login
