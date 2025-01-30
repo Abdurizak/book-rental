@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const AdminDashboard = () => {
@@ -9,6 +9,18 @@ const AdminDashboard = () => {
   const [funFact, setFunFact] = useState('');
   const [message, setMessage] = useState('');
   const [books, setBooks] = useState([]);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get('/api/admin/books');
+        setBooks(response.data);
+      } catch (error) {
+        console.error("Error fetching books", error);
+      }
+    };
+    fetchBooks();
+  }, []);
 
   const handleAddBook = async () => {
     try {
@@ -63,8 +75,8 @@ const AdminDashboard = () => {
       <div className="mt-8">
         <h3 className="text-xl font-semibold mb-4">Available Books</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {books.map((book, index) => (
-            <div key={index} className="bg-white p-4 rounded-lg shadow-md">
+          {books.map((book) => (
+            <div key={book.id} className="bg-white p-4 rounded-lg shadow-md">
               <h4 className="text-lg font-bold">{book.title}</h4>
               <p className="text-gray-700"><strong>Author:</strong> {book.author}</p>
               <p className="text-gray-700"><strong>Genre:</strong> {book.genre}</p>

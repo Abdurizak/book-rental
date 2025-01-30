@@ -7,149 +7,114 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
-  const [current_user, setCurrentUser] = useState(null);
-  const [user, setUser] = useState(null); // Stores user role (added from second snippet)
+  const [currentUser, setCurrentUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // Add User
-  const addUser = (username, email, password, grade, role) => {
-    toast.loading("...Adding User");
-    fetch("http://127.0.0.1:5000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, email, password, grade, role }),
-    })
-      .then((resp) => resp.json())
-      .then((response) => {
-        console.log(response);
-
-        if (response.success) {
-          toast.dismiss();
-          toast.success(response.success);
-          navigate("/Login");
-        } else if (response.error) {
-          toast.dismiss();
-          toast.error(response.error);
-        } else {
-          toast.dismiss();
-          toast.error("Failed to add");
-        }
+  const addUser = async (username, email, password, grade, role) => {
+    try {
+      toast.loading("Adding User...");
+      const response = await fetch("http://127.0.0.1:5000/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password, grade, role }),
       });
+      const data = await response.json();
+
+      toast.dismiss();
+      if (data.success) {
+        toast.success(data.success);
+        navigate("/Login");
+      } else {
+        toast.error(data.error || "Failed to add user");
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("An error occurred while adding user");
+    }
   };
 
-  // Login
   const login = async (email, password, role) => {
     try {
       toast.loading("Logging you in...");
       const response = await fetch("http://127.0.0.1:5000/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
       });
-
+  
       const data = await response.json();
-
-      if (data.access_token) {
-        toast.dismiss();
-
+      toast.dismiss();
+  
+      if (data.access_token && data.access_token.split('.').length === 3) { // Ensure it's a valid JWT
         sessionStorage.setItem("token", data.access_token);
+        console.log("Token saved:", data.access_token);
         setAuthToken(data.access_token);
-        setUser({ role: data.role }); // Store the user's role (added from second snippet)
-
-        fetch("http://127.0.0.1:5000/current_user", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${data.access_token}`,
-          },
-        })
-          .then((res) => res.json())
-          .then((resData) => {
-            if (resData.email) {
-              setCurrentUser(resData);
-            }
-          });
-
+        setUser({ role: data.role });
+  
+        await fetchCurrentUser(data.access_token);
         toast.success("Successfully Logged in");
-        navigate(role === "admin" ? "/admin" : "/");
-      } else if (data.error) {
-        toast.dismiss();
-        toast.error(data.error);
+  
+        if (data.role === "admin") {
+          navigate("/AdminDashboard");
+        } else if (data.role === "user") {
+          navigate("/UserDashboard");
+        }
       } else {
-        toast.dismiss();
-        toast.error("Failed to login");
+        toast.error("Invalid login credentials");
       }
     } catch (error) {
       toast.dismiss();
-      console.error("Login failed:", error);
       toast.error("Login failed. Please try again.");
     }
   };
-
-  // Logout
-  const logout = async () => {
+  
+  const logout = () => {
     sessionStorage.removeItem("token");
     setAuthToken(null);
     setCurrentUser(null);
-    setUser(null); // Clear user role (added from second snippet)
+    setUser(null);
     toast.success("Successfully logged out!");
     navigate("/Login");
   };
 
-  // Fetch Current User
-  const fetchCurrentUser = () => {
-    console.log("Current user function ", authToken);
-
-    if (authToken) {
-      fetch("http://127.0.0.1:5000/current_user", {
+  const fetchCurrentUser = async (token = authToken) => {
+    if (!token || token.split('.').length !== 3) { // Check if it's a valid JWT format
+      console.warn("Invalid or missing token! User is not authenticated.");
+      return;
+    }
+  
+    try {
+      console.log("Fetching user with token:", token); // Debugging line
+  
+      const response = await fetch("http://127.0.0.1:5000/current_user", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
-      })
-        .then((response) => response.json())
-        .then((response) => {
-          if (response.email) {
-            setCurrentUser(response);
-          }
-        });
+      });
+  
+      const data = await response.json();
+      console.log("Fetched User Data:", data); // Debugging line
+  
+      if (data.email) {
+        setCurrentUser(data);
+      } else {
+        console.error("Invalid user data received:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch user data:", error);
+      toast.error("Error fetching user data");
     }
   };
-
-  // Fetch All Users
-  const getUsers = () => {
-    console.log("Fetching all Users");
-  };
-
-  // Update User
-  const updateUser = (userId, updatedData) => {
-    console.log("Update User", userId, updatedData);
-  };
-
-  // Delete User
-  const deleteUser = async (userId) => {
-    console.log("Delete user:", userId);
-  };
-
+  
   useEffect(() => {
     fetchCurrentUser();
-  }, []);
+  }, [authToken]);
 
-  const data = {
-    login,
-    logout,
-    fetchCurrentUser,
-    getUsers,
-    deleteUser,
-    updateUser,
-    addUser,
-    current_user,
-    user, // Exposes the user role (added from second snippet)
-  };
-
-  return <UserContext.Provider value={data}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ login, logout, fetchCurrentUser, addUser, currentUser, user }}>
+      {children}
+    </UserContext.Provider>
+  );
 };

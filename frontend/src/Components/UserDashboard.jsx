@@ -1,54 +1,49 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import axios from 'axios';
 
-const UserRentals = () => {
-  const [rentals, setRentals] = useState([]);
+const UserDashboard = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [books, setBooks] = useState([]);
 
-  useEffect(() => {
-    const fetchRentals = async () => {
-      try {
-        const response = await axios.get("/api/user/rentals"); // Create this route in your backend
-        setRentals(response.data);
-      } catch (error) {
-        console.error("Error fetching rentals");
-      }
-    };
-    fetchRentals();
-  }, []);
-
-  const handleReturnBook = async (rentalId) => {
+  const handleSearch = async () => {
     try {
-      await axios.post(`/api/user/return-book/${rentalId}`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      });
-      alert("Book returned successfully");
-      setRentals((prevRentals) =>
-        prevRentals.map((rental) =>
-          rental.id === rentalId ? { ...rental, status: "Returned" } : rental
-        )
-      );
+      const response = await axios.get(`/api/books?search=${searchQuery}`);
+      setBooks(response.data);
     } catch (error) {
-      alert("Error returning book");
+      console.error('Error searching books');
+    }
+  };
+
+  const handleRentBook = async (bookId) => {
+    try {
+      await axios.post('/api/rent-book', { bookId });
+      alert('Book rented successfully');
+    } catch (error) {
+      alert('Error renting book');
     }
   };
 
   return (
     <div>
-      <h2>Your Rentals</h2>
-      <ul>
-        {rentals.map((rental) => (
-          <li key={rental.id}>
-            <p>{rental.book.title} (Status: {rental.status})</p>
-            {rental.status === "Rented" && (
-              <button onClick={() => handleReturnBook(rental.id)}>
-                Return Book
-              </button>
-            )}
-          </li>
+      <h2>User Dashboard</h2>
+      <input
+        type="text"
+        placeholder="Search for books"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <button onClick={handleSearch}>Search</button>
+
+      <div>
+        {books.map((book) => (
+          <div key={book.id}>
+            <p>{book.title} by {book.author}</p>
+            <button onClick={() => handleRentBook(book.id)}>Rent</button>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
 
-export default UserRentals;
+export default UserDashboard;

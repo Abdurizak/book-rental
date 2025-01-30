@@ -15,8 +15,8 @@ import { ToastContainer } from "react-toastify";
 const ProtectedRoute = ({ element, role }) => {
   const { user } = useContext(UserContext);
 
-  if (!user) return <Navigate to="/Login" />; // Redirect if not logged in
-  if (role && user.role !== role) return <Navigate to="/" />; // Redirect if role doesn't match
+  if (!user) return <Navigate to="/Login" replace />; // Redirect if not logged in
+  if (role && user.role !== role) return <Navigate to="/" replace />; // Restrict access by role
 
   return element;
 };
@@ -30,9 +30,9 @@ function App() {
             <Routes>
               <Route index element={<Home />} />
               <Route path="Login" element={<Login />} />
-              <Route path="Register" element={<Register />} />
-              <Route path="user-dashboard" element={<ProtectedRoute element={<UserDashboard />} role="user" />} />
-              <Route path="admin-dashboard" element={<ProtectedRoute element={<AdminDashboard />} role="admin" />} />
+              <Route path="Register" element={<Register />} /> 
+              <Route path="UserDashboard" element={<ProtectedRoute element={<UserDashboard />} role="user" />} />
+              <Route path="AdminDashboard" element={<ProtectedRoute element={<AdminDashboard />} role="admin" />} />
               <Route path="*" element={<NoPage />} />
             </Routes>
           </MainLayout>
