@@ -8,7 +8,7 @@ export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
   const [current_user, setCurrentUser] = useState(null);
-  const [user, setUser] = useState(null); // Store user role
+  const [user, setUser] = useState(null); // Stores user role (added from second snippet)
 
   // Add User
   const addUser = (username, email, password, grade, role) => {
@@ -57,7 +57,7 @@ export const UserProvider = ({ children }) => {
 
         sessionStorage.setItem("token", data.access_token);
         setAuthToken(data.access_token);
-        setUser({ role: data.role }); // Store the user's role
+        setUser({ role: data.role }); // Store the user's role (added from second snippet)
 
         fetch("http://127.0.0.1:5000/current_user", {
           method: "GET",
@@ -69,18 +69,12 @@ export const UserProvider = ({ children }) => {
           .then((res) => res.json())
           .then((resData) => {
             if (resData.email) {
-              setCurrentUser(resData); // Set current user data
+              setCurrentUser(resData);
             }
           });
 
         toast.success("Successfully Logged in");
-
-        // After successful login, redirect based on role
-        if (data.role === "admin") {
-          navigate("/admin-dashboard");  // Redirect to admin dashboard
-        } else {
-          navigate("/user-dashboard");  // Redirect to user dashboard
-        }
+        navigate(role === "admin" ? "/admin" : "/");
       } else if (data.error) {
         toast.dismiss();
         toast.error(data.error);
@@ -100,7 +94,7 @@ export const UserProvider = ({ children }) => {
     sessionStorage.removeItem("token");
     setAuthToken(null);
     setCurrentUser(null);
-    setUser(null); // Clear user role
+    setUser(null); // Clear user role (added from second snippet)
     toast.success("Successfully logged out!");
     navigate("/Login");
   };
@@ -120,7 +114,7 @@ export const UserProvider = ({ children }) => {
         .then((response) => response.json())
         .then((response) => {
           if (response.email) {
-            setCurrentUser(response); // Set current user data
+            setCurrentUser(response);
           }
         });
     }
@@ -154,7 +148,7 @@ export const UserProvider = ({ children }) => {
     updateUser,
     addUser,
     current_user,
-    user, // Exposes the user role
+    user, // Exposes the user role (added from second snippet)
   };
 
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;

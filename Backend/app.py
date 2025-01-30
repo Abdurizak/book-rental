@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy 
-from models import db
+from models import db, User, Book, Rental
 from Views import *
 from flask_jwt_extended import JWTManager
 from datetime import timedelta
