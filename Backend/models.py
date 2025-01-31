@@ -15,22 +15,25 @@ class User(db.Model):
     grade = db.Column(db.Integer, nullable=False)
     password = db.Column(db.String(128), nullable=False)
 
-    books = db.relationship("Book", backref="user", lazy=True)
+    books = db.relationship("Book", backref="borrower", lazy=True)
+    rentals = db.relationship("Rental", backref="renter", lazy=True)  # Fix backref conflict
 
 class Book(db.Model):
     __tablename__ = "book"
-
     id = db.Column(db.Integer, primary_key=True)
-    Title = db.Column(db.String(128), nullable=False)
-    Genre = db.Column(db.String(128), nullable=False)
-    description = db.Column(db.Text, nullable=False)  # Added description
-    fun_fact = db.Column(db.Text, nullable=True)  # Added fun fact
-    borrowed_at = db.Column(db.DateTime, nullable=True)  # Can be NULL if not borrowed
+    title = db.Column(db.String(128), nullable=False)  # ✅ lowercase
+    author = db.Column(db.String(128), nullable=False)  
+    genre = db.Column(db.String(128), nullable=False)  
+    description = db.Column(db.Text, nullable=False)  
+    fun_fact = db.Column(db.Text, nullable=True)  
+    borrowed_at = db.Column(db.DateTime, nullable=True)
     returned_at = db.Column(db.DateTime, nullable=True)
-
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
 
-class Rental(db.Model):  # ✅ Added Rental Model
+
+
+
+class Rental(db.Model):  # ✅ Fixed Rental Model
     __tablename__ = "rental"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -39,8 +42,8 @@ class Rental(db.Model):  # ✅ Added Rental Model
     borrowed_at = db.Column(db.DateTime, default=datetime.utcnow)
     returned_at = db.Column(db.DateTime, nullable=True)
 
-    user = db.relationship("User", backref="rentals")
-    book = db.relationship("Book", backref="rentals")
+    user = db.relationship("User", backref="rental_records")
+    book = db.relationship("Book", backref="rented_by")  # ✅ Fixed typo in model reference
 
 class TokenBlocklist(db.Model):
     __tablename__ = "token_blocklist"

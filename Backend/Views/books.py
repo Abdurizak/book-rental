@@ -2,8 +2,10 @@ from flask import jsonify, request, Blueprint
 from models import db, Book, User
 from datetime import datetime, timedelta
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_cors import CORS
 
 books_bp = Blueprint("books_bp", __name__)
+CORS(books_bp)
 
 # ===========================
 # Add a New Book (Admin Only)
@@ -13,26 +15,26 @@ books_bp = Blueprint("books_bp", __name__)
 def add_books():
     try:
         data = request.get_json()
-        Title = data['Title']
-        Genre = data['Genre']
-        Description = data.get('Description', '')  # Optional
-        FunFact = data.get('FunFact', '')  # Optional
+        
+        if not all(k in data for k in ["title", "author", "genre", "description", "fun_fact"]):
+            return jsonify({"error": "Missing required fields"}), 400
 
         new_book = Book(
-            Title=Title,
-            Genre=Genre,
-            Description=Description,
-            FunFact=FunFact,
-            borrowed_at=None,
-            returned_at=None,
-            is_rented=False
+            title=data.get("title"),
+            author=data.get("author"),
+            genre=data.get("genre"),
+            description=data.get("description", ""),
+            fun_fact=data.get("fun_fact", "")
         )
+
         db.session.add(new_book)
         db.session.commit()
         return jsonify({"success": "Book added successfully"}), 201
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
 
 # ===========================
 # Fetch Books (Admin & Users)
@@ -40,26 +42,30 @@ def add_books():
 @books_bp.route("/books", methods=["GET"])
 @jwt_required()
 def fetch_books():
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    try:
+        books = Book.query.all()
 
-    if user.role == "admin":
-        books = Book.query.all()  # Admin sees all books
-    else:
-        books = Book.query.filter_by(user_id=current_user_id).all()  # Users only see their books
+        # ✅ Debugging: Print books in the backend
+        print("Books in DB:", books)
 
-    return jsonify([
-        {
-            "id": book.id,
-            "Title": book.Title,
-            "Genre": book.Genre,
-            "Description": book.Description,
-            "FunFact": book.FunFact,
-            "borrowed_at": book.borrowed_at,
-            "returned_at": book.returned_at,
-            "is_rented": book.is_rented
-        } for book in books
-    ]), 200
+        return jsonify([
+            {
+                "id": book.id,
+                "title": book.title,  # ✅ Ensure correct field names
+                "author": book.author,
+                "genre": book.genre,
+                "description": book.description,
+                "fun_fact": book.fun_fact,
+                "borrowed_at": book.borrowed_at,
+                "returned_at": book.returned_at,
+                "is_rented": book.borrowed_at is not None
+            } for book in books
+        ]), 200
+
+    except Exception as e:
+        print("Error fetching books:", str(e))  # ✅ Debugging
+        return jsonify({"error": str(e)}), 500
+
 
 # ===========================
 # Fetch a Single Book
@@ -71,10 +77,10 @@ def get_book(book_id):
     if book:
         return jsonify({
             "id": book.id,
-            "Title": book.Title,
-            "Genre": book.Genre,
-            "Description": book.Description,
-            "FunFact": book.FunFact,
+            "title": book.title,
+            "genre": book.genre,
+            "description": book.description,
+            "fun_fact": book.fun_fact,
             "borrowed_at": book.borrowed_at,
             "returned_at": book.returned_at,
             "is_rented": book.is_rented
@@ -94,10 +100,10 @@ def update_book(book_id):
         if not book:
             return jsonify({"error": "Book not found"}), 404
 
-        book.Title = data.get('Title', book.Title)
-        book.Genre = data.get('Genre', book.Genre)
-        book.Description = data.get('Description', book.Description)
-        book.FunFact = data.get('FunFact', book.FunFact)
+        book.title = data.get('title', book.title)
+        book.genre = data.get('genre', book.genre)
+        book.description = data.get('description', book.description)
+        book.fun_fact = data.get('fun_fact', book.fun_fact)
 
         db.session.commit()
         return jsonify({"success": "Book updated successfully"}), 200
@@ -175,8 +181,8 @@ def get_borrowed_books():
     return jsonify([
         {
             "id": book.id,
-            "Title": book.Title,
-            "Genre": book.Genre,
+            "title": book.title,
+            "genre": book.genre,
             "borrowed_at": book.borrowed_at
         } for book in books
     ]), 200
@@ -191,8 +197,8 @@ def get_overdue_books():
     return jsonify([
         {
             "id": book.id,
-            "Title": book.Title,
-            "Genre": book.Genre,
+            "title": book.title,
+            "genre": book.genre,
             "returned_at": book.returned_at
         } for book in overdue_books
     ]), 200
@@ -208,26 +214,3 @@ def calculate_fine():
     total_fine = sum((datetime.now() - book.returned_at).days * 0.5 for book in books if book.returned_at)
 
     return jsonify({"total_fine": total_fine}), 200
-
-# ===========================
-# Generate Report of All Books
-# ===========================
-@books_bp.route("/books/report", methods=["GET"])
-@jwt_required()
-def generate_report():
-    books = Book.query.all()
-    
-    report = [
-        {
-            "Title": book.Title,
-            "Genre": book.Genre,
-            "Description": book.Description,
-            "FunFact": book.FunFact,
-            "Borrowed_at": book.borrowed_at,
-            "Returned_at": book.returned_at,
-            "Overdue": book.returned_at and (datetime.now() - book.returned_at).days > 0
-        }
-        for book in books
-    ]
-    
-    return jsonify(report), 200

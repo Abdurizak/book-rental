@@ -7,8 +7,10 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const navigate = useNavigate();
   const [authToken, setAuthToken] = useState(() => sessionStorage.getItem("token"));
-  const [currentUser, setCurrentUser] = useState(null);
-  const [user, setUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => {
+    const storedUser = sessionStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
   const addUser = async (username, email, password, grade, role) => {
     try {
@@ -41,24 +43,29 @@ export const UserProvider = ({ children }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
       });
-  
+
       const data = await response.json();
       toast.dismiss();
-  
-      if (data.access_token && data.access_token.split('.').length === 3) { // Ensure it's a valid JWT
+
+      if (data.access_token && data.access_token.split('.').length === 3) {
         sessionStorage.setItem("token", data.access_token);
         console.log("Token saved:", data.access_token);
         setAuthToken(data.access_token);
-        setUser({ role: data.role });
-  
-        await fetchCurrentUser(data.access_token);
-        toast.success("Successfully Logged in");
-  
-        if (data.role === "admin") {
+
+        const userData = { email, role };
+        sessionStorage.setItem("user", JSON.stringify(userData)); 
+        setCurrentUser(userData);
+
+        // Redirect user based on role
+        if (role.toLowerCase() === "admin") {
           navigate("/AdminDashboard");
-        } else if (data.role === "user") {
+        } else if (role.toLowerCase() === "user") {
           navigate("/UserDashboard");
+        } else {
+          navigate("/");
         }
+
+        toast.success("Successfully Logged in");
       } else {
         toast.error("Invalid login credentials");
       }
@@ -67,53 +74,27 @@ export const UserProvider = ({ children }) => {
       toast.error("Login failed. Please try again.");
     }
   };
-  
+
   const logout = () => {
-    sessionStorage.removeItem("token");
+    sessionStorage.clear();
     setAuthToken(null);
     setCurrentUser(null);
-    setUser(null);
     toast.success("Successfully logged out!");
     navigate("/Login");
   };
 
-  const fetchCurrentUser = async (token = authToken) => {
-    if (!token || token.split('.').length !== 3) { // Check if it's a valid JWT format
-      console.warn("Invalid or missing token! User is not authenticated.");
-      return;
-    }
-  
-    try {
-      console.log("Fetching user with token:", token); // Debugging line
-  
-      const response = await fetch("http://127.0.0.1:5000/current_user", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      const data = await response.json();
-      console.log("Fetched User Data:", data); // Debugging line
-  
-      if (data.email) {
-        setCurrentUser(data);
-      } else {
-        console.error("Invalid user data received:", data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
-      toast.error("Error fetching user data");
-    }
-  };
-  
   useEffect(() => {
-    fetchCurrentUser();
-  }, [authToken]);
+    const storedToken = sessionStorage.getItem("token");
+    const storedUser = sessionStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      setAuthToken(storedToken);
+      setCurrentUser(JSON.parse(storedUser));
+    }
+  }, []);
 
   return (
-    <UserContext.Provider value={{ login, logout, fetchCurrentUser, addUser, currentUser, user }}>
+    <UserContext.Provider value={{ login, logout, addUser, currentUser }}>
       {children}
     </UserContext.Provider>
   );
