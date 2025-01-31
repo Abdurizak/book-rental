@@ -134,23 +134,33 @@ def delete_book(book_id):
 @books_bp.route("/books/<int:book_id>/borrow", methods=["PUT"])
 @jwt_required()
 def borrow_book(book_id):
-    book = Book.query.get(book_id)
-    
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
-    
-    if book.is_rented:
-        return jsonify({"error": "Book is already rented"}), 400
-    
-    book.is_rented = True
-    book.borrowed_at = datetime.now()
-    book.returned_at = datetime.now() + timedelta(days=14)  # Due in 2 weeks
-    db.session.commit()
-    
-    return jsonify({
-        "success": "Book borrowed successfully",
-        "return_date": book.returned_at.strftime("%Y-%m-%d")
-    }), 200
+    try:
+        print(f"🔄 Borrow request received for book ID: {book_id}")  # Debugging
+        
+        book = Book.query.get(book_id)
+        
+        if not book:
+            print("❌ Book not found in database")
+            return jsonify({"error": "Book not found"}), 404
+        
+        if book.borrowed_at:
+            print("❌ Book is already rented")
+            return jsonify({"error": "Book is already rented"}), 400
+        
+        book.borrowed_at = datetime.utcnow()
+        book.returned_at = datetime.utcnow() + timedelta(days=14)  # 2 weeks return period
+        db.session.commit()
+        
+        print(f"✅ Book rented successfully. Return by {book.returned_at.strftime('%Y-%m-%d')}")
+        return jsonify({
+            "success": "Book rented successfully",
+            "return_date": book.returned_at.strftime("%Y-%m-%d")
+        }), 200
+
+    except Exception as e:
+        print(f"🔥 ERROR: {str(e)}")  # Print error to console
+        return jsonify({"error": str(e)}), 500
+
 
 # ===========================
 # Return a Book

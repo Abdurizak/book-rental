@@ -12,14 +12,16 @@ const UserDashboard = () => {
     fetchBooks();
   }, []);
 
-  // Fetch all books that admin has added
+  // Fetch all books added by the admin
   const fetchBooks = async () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem("token");
-      const response = await axios.get("http://127.0.0.1:5000/api/books", {
+      const response = await axios.get("http://127.0.0.1:5000/books", {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      console.log("Fetched Books:", response.data); // Debugging to see what data is returned
       setBooks(response.data);
     } catch (error) {
       setError("Failed to load books.");
@@ -34,7 +36,7 @@ const UserDashboard = () => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(
-        `http://127.0.0.1:5000/api/books?search=${searchQuery}`,
+        `http://127.0.0.1:5000/books?search=${searchQuery}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setBooks(response.data);
@@ -50,19 +52,26 @@ const UserDashboard = () => {
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.put(
-        `http://127.0.0.1:5000/api/books/${bookId}/borrow`,
+        `http://127.0.0.1:5000/books/${bookId}/borrow`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
+  
       alert(`Book rented successfully. Return by: ${response.data.return_date}`);
+  
+      // Update UI with rented book details
       setRentedBooks((prev) => ({
         ...prev,
         [bookId]: response.data.return_date,
       }));
+  
+      fetchBooks(); // Refresh book list
     } catch (error) {
-      alert("Error renting book. Try again later.");
+      console.error("Error renting book:", error.response?.data || error.message);
+      alert(`Error renting book: ${error.response?.data?.error || "Try again later."}`);
     }
   };
+  
 
   if (loading) return <h2 className="text-center text-blue-600">Loading books...</h2>;
   if (error) return <h2 className="text-center text-red-500">{error}</h2>;
@@ -96,11 +105,11 @@ const UserDashboard = () => {
               key={book.id}
               className="bg-white shadow-lg rounded-lg p-5 hover:shadow-xl transition duration-300"
             >
-              <h3 className="text-xl font-semibold text-gray-800">{book.Title}</h3>
-              <p className="text-gray-600"><strong>Author:</strong> {book.Author}</p>
-              <p className="text-gray-600"><strong>Genre:</strong> {book.Genre}</p>
-              <p className="text-gray-500"><strong>Description:</strong> {book.Description}</p>
-              <p className="text-gray-500 italic"><strong>Fun Fact:</strong> {book.FunFact}</p>
+              <h3 className="text-xl font-semibold text-gray-800">{book.title}</h3>
+              <p className="text-gray-600"><strong>Author:</strong> {book.author}</p>
+              <p className="text-gray-600"><strong>Genre:</strong> {book.genre}</p>
+              <p className="text-gray-500"><strong>Description:</strong> {book.description}</p>
+              <p className="text-gray-500 italic"><strong>Fun Fact:</strong> {book.fun_fact}</p>
 
               {/* Rent Book Button */}
               {rentedBooks[book.id] ? (
