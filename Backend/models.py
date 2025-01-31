@@ -13,7 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(128), nullable=False, unique=True)
     role = db.Column(db.String(64), nullable=False, default="user")
     grade = db.Column(db.Integer, nullable=False)
-    password = db.Column(db.String(128), nullable=False)
+    password = db.Column(db.String(512), nullable=False)
 
     books = db.relationship("Book", backref="borrower", lazy=True)
     rentals = db.relationship("Rental", backref="renter", lazy=True)  # Fix backref conflict
