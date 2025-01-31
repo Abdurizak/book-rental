@@ -101,6 +101,7 @@ def update_book(book_id):
             return jsonify({"error": "Book not found"}), 404
 
         book.title = data.get('title', book.title)
+        book.author = data.get('author', book.author)
         book.genre = data.get('genre', book.genre)
         book.description = data.get('description', book.description)
         book.fun_fact = data.get('fun_fact', book.fun_fact)
@@ -110,6 +111,7 @@ def update_book(book_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 400
+
 
 # ===========================
 # Delete a Book (Admin)

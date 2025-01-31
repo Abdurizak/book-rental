@@ -68,9 +68,41 @@ const AdminDashboard = () => {
       alert("Error adding book: " + (error.response?.data?.error || error.message));
     }
 };
+const handleUpdateBook = async (bookId) => {
+  const updatedTitle = prompt("Enter new title:");
+  const updatedAuthor = prompt("Enter new author:");
+  const updatedGenre = prompt("Enter new genre:");
+  const updatedDescription = prompt("Enter new description:");
+  const updatedFunFact = prompt("Enter new fun fact:");
 
-  
-  
+  if (!updatedTitle || !updatedAuthor || !updatedGenre || !updatedDescription) {
+    alert("Please enter all fields!");
+    return;
+  }
+
+  try {
+    const token = sessionStorage.getItem("token");
+    await axios.patch(`http://127.0.0.1:5000/books/${bookId}`, 
+      {
+        title: updatedTitle,
+        author: updatedAuthor,
+        genre: updatedGenre,
+        description: updatedDescription,
+        fun_fact: updatedFunFact,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    alert("Book updated successfully!");
+    fetchBooks(); // Refresh book list
+  } catch (error) {
+    console.error("Error updating book:", error);
+    alert("Failed to update book.");
+  }
+};
+    
 
   // Delete a book
   const handleDeleteBook = async (bookId) => {
@@ -112,12 +144,14 @@ const AdminDashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {books.length > 0 ? books.map((book) => (
           <div key={book.id} className="bg-white p-6 rounded shadow-md">
-            <h3 className="text-lg font-bold">{book.Title}</h3>
-            <p><strong>Genre:</strong> {book.Genre}</p>
-            <p><strong>Description:</strong> {book.Description}</p>
-            <p className="italic"><strong>Fun Fact:</strong> {book.FunFact}</p>
-            <p><strong>Status:</strong> {book.is_rented ? `Rented (Return by ${book.returned_at})` : "Available"}</p>
-            <button onClick={() => handleDeleteBook(book.id)} className="mt-4 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-800 transition">Delete</button>
+            <h3 className="text-lg font-bold">{book.title}</h3> {/* ✅ Fix Title */}
+            <p><strong>Author:</strong> {book.author}</p> {/* ✅ Add Author */}
+            <p><strong>Genre:</strong> {book.genre}</p>
+            <p><strong>Description:</strong> {book.description}</p>
+            <p className="italic"><strong>Fun Fact:</strong> {book.fun_fact}</p>
+            <p><strong>Status:</strong> {book.is_rented ? `Rented (Return by ${book.returned_at})` : "Available"}</p> 
+            <button onClick={() => handleUpdateBook(book.id)}  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition mr-2">Update</button>
+            <button onClick={() => handleDeleteBook(book.id)}  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800 transition">Delete</button>
           </div>
         )) : (
           <p className="text-gray-600">No books available.</p>
@@ -128,3 +162,4 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
+
