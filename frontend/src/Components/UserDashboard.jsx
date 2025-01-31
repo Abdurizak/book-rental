@@ -12,7 +12,7 @@ const UserDashboard = () => {
     fetchBooks();
   }, []);
 
-  // Fetch all books added by the admin
+  // Fetch all books
   const fetchBooks = async () => {
     setLoading(true);
     try {
@@ -21,27 +21,10 @@ const UserDashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Fetched Books:", response.data); // Debugging to see what data is returned
+      console.log("Fetched Books:", response.data);
       setBooks(response.data);
     } catch (error) {
       setError("Failed to load books.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle book search
-  const handleSearch = async () => {
-    setLoading(true);
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await axios.get(
-        `http://127.0.0.1:5000/books?search=${searchQuery}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setBooks(response.data);
-    } catch (error) {
-      setError("Error searching books.");
     } finally {
       setLoading(false);
     }
@@ -56,22 +39,49 @@ const UserDashboard = () => {
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-  
+
       alert(`Book rented successfully. Return by: ${response.data.return_date}`);
-  
-      // Update UI with rented book details
+
+      // Update rented book list
       setRentedBooks((prev) => ({
         ...prev,
         [bookId]: response.data.return_date,
       }));
-  
+
       fetchBooks(); // Refresh book list
     } catch (error) {
       console.error("Error renting book:", error.response?.data || error.message);
       alert(`Error renting book: ${error.response?.data?.error || "Try again later."}`);
     }
   };
+
+  // Return a book
+  const handleReturnBook = async (bookId) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const response = await axios.put(
+        `http://127.0.0.1:5000/books/${bookId}/return`,
+        {}, // ✅ Empty request body
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
   
+      alert("Book returned successfully!");
+  
+      // ✅ Update UI to reflect return
+      setRentedBooks((prev) => {
+        const updatedRentedBooks = { ...prev };
+        delete updatedRentedBooks[bookId];
+        return updatedRentedBooks;
+      });
+  
+      fetchBooks(); // Refresh book list
+    } catch (error) {
+      console.error("Error returning book:", error.response?.data || error.message);
+      alert(`Error returning book: ${error.response?.data?.error || "Try again later."}`);
+    }
+  };
+  
+
 
   if (loading) return <h2 className="text-center text-blue-600">Loading books...</h2>;
   if (error) return <h2 className="text-center text-red-500">{error}</h2>;
@@ -79,23 +89,6 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">📚 User Dashboard</h2>
-
-      {/* Search Bar */}
-      <div className="flex justify-center mb-6">
-        <input
-          type="text"
-          placeholder="Search for books..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-1/2 p-3 border border-gray-300 rounded-l-lg focus:outline-none"
-        />
-        <button
-          onClick={handleSearch}
-          className="px-4 py-3 bg-blue-600 text-white font-semibold rounded-r-lg hover:bg-blue-700"
-        >
-          🔍 Search
-        </button>
-      </div>
 
       {/* Books Display */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -111,11 +104,14 @@ const UserDashboard = () => {
               <p className="text-gray-500"><strong>Description:</strong> {book.description}</p>
               <p className="text-gray-500 italic"><strong>Fun Fact:</strong> {book.fun_fact}</p>
 
-              {/* Rent Book Button */}
-              {rentedBooks[book.id] ? (
-                <p className="text-green-600 mt-3 font-semibold">
-                  ✅ Rented - Return by {rentedBooks[book.id]}
-                </p>
+              {/* Rent & Return Book Buttons */}
+              {book.is_rented ? (
+                <button
+                  onClick={() => handleReturnBook(book.id)}
+                  className="mt-3 w-full bg-yellow-600 text-white py-2 rounded hover:bg-yellow-700 transition-all"
+                >
+                  🔄 Return Book
+                </button>
               ) : (
                 <button
                   onClick={() => handleRentBook(book.id)}

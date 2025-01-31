@@ -168,20 +168,27 @@ def borrow_book(book_id):
 @books_bp.route("/books/<int:book_id>/return", methods=["PUT"])
 @jwt_required()
 def return_book(book_id):
-    book = Book.query.get(book_id)
+    try:
+        book = Book.query.get(book_id)
 
-    if not book:
-        return jsonify({"error": "Book not found"}), 404
-    
-    if not book.is_rented:
-        return jsonify({"error": "Book is not rented"}), 400
-    
-    book.is_rented = False
-    book.borrowed_at = None
-    book.returned_at = None
-    db.session.commit()
-    
-    return jsonify({"success": "Book returned successfully"}), 200
+        if not book:
+            return jsonify({"error": "Book not found"}), 404
+
+        if not book.is_rented:
+            return jsonify({"error": "Book is not currently rented"}), 400
+
+        # Update book status
+        book.is_rented = False
+        book.borrowed_at = None
+        book.returned_at = datetime.utcnow()
+
+        db.session.commit()
+
+        return jsonify({"success": "Book returned successfully"}), 200
+    except Exception as e:
+        db.session.rollback()  # ✅ Rollback in case of error
+        return jsonify({"error": str(e)}), 500
+
 
 # ===========================
 # Get Borrowed Books

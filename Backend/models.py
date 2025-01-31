@@ -20,15 +20,19 @@ class User(db.Model):
 
 class Book(db.Model):
     __tablename__ = "book"
+
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128), nullable=False)  # ✅ lowercase
-    author = db.Column(db.String(128), nullable=False)  
-    genre = db.Column(db.String(128), nullable=False)  
-    description = db.Column(db.Text, nullable=False)  
-    fun_fact = db.Column(db.Text, nullable=True)  
+    title = db.Column(db.String(128), nullable=False)
+    author = db.Column(db.String(128), nullable=False)
+    genre = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    fun_fact = db.Column(db.Text, nullable=True)
     borrowed_at = db.Column(db.DateTime, nullable=True)
     returned_at = db.Column(db.DateTime, nullable=True)
+    is_rented = db.Column(db.Boolean, default=False)  # ✅ Added column
+
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+
 
 
 
