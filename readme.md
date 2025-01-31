@@ -1,173 +1,129 @@
-# Books Management API
+## 📚 Heaven of Pages - Book Rental System
 
-This API allows users to manage books, including adding, updating, deleting, and retrieving books associated with their accounts. JWT-based authentication ensures that users can only access and manipulate their own data.
+## 📝 Project Description
 
----
+Heaven of Pages is an online book rental platform that allows users to browse, rent, and return books seamlessly. Admins can manage books, track rentals, and oversee the entire process efficiently.
 
-## Features
+## 🚀 Features
 
-- **Add Books**: Users can add books with attributes like title, genre, and borrowing/returning dates.
-- **Retrieve Books**: Fetch all books for the authenticated user or retrieve a specific book by its ID.
-- **Update Books**: Modify details of a book.
-- **Delete Books**: Remove a book from the database.
-- **JWT Authentication**: Ensures secure and personalized access for users.
+# User Features
 
----
+✅ User Registration - Users can register an account to rent books.✅ Login & Authentication - Users can log in to manage their rentals.✅ Search Books - Users can search for available books in the library.✅ Rent a Book - Users can borrow a book and get notified about the return date.✅ Return a Book - Users can return a rented book before or on the due date.✅ Logout - Users can log out after completing their transactions.
 
-## Installation
+# Admin Features
 
-1. Clone the repository:
+✅ Add Books - Admins can add books to the platform for users to rent.✅ Manage Rentals - Admins can track book rentals and their return status.✅ Update Books - Admins can modify book details.✅ Delete Books - Admins can remove books from the platform.
 
-   ```bash
-   git clone <repository_url>
-   cd <repository_directory>
-   ```
+# Upcoming Features
 
-2. Install dependencies using `pipenv`:
+❌ Notifications for Due Date - Users will receive notifications before the book return date.
 
-   ```bash
-   pipenv install
-   ```
+## 🛠 Tech Stack
 
-3. Activate the environment:
+Frontend: React.js, Tailwind CSS
 
-   ```bash
-   pipenv shell
-   ```
+Backend: Flask (Python)
 
-4. Set up the database:
+Database: SQLAlchemy (SQLite)
 
-   Open a Python shell and run the following commands:
+Authentication: JWT (JSON Web Tokens)
 
-   ```python
-   from app import db
-   db.create_all()
-   ```
+API Communication: Axios
 
----
+## 📂 Project Structure
 
-## Environment Variables
+📂 Heaven-of-Pages
+├── 📁 Backend (Flask)
+│   ├── app.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── requirements.txt
+│   ├── migrations/
+│
+├── 📁 Frontend (React.js)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── UserDashboard.jsx
+│   │   │   ├── AdminDashboard.jsx
+│   │   ├── App.js
+│   │   ├── index.js
+│   ├── package.json
+│
+├── README.md
 
-Create a `.env` file in the root of your project and add the following:
+## 🔧 Setup Instructions
 
-```env
-FLASK_APP=app.py
-FLASK_ENV=development
-SECRET_KEY=your_secret_key
-JWT_SECRET_KEY=your_jwt_secret_key
-```
+1️⃣ Clone the Repository
 
----
+git clone https://github.com/Abdurizak/book-rental
+cd book-rental
 
-## Running the Application
+2️⃣ Backend Setup (Flask API)
 
-Start the Flask development server:
+cd Backend
+python -m venv venv
+source venv/bin/activate  # On Windows use 'venv\Scripts\activate'
+pip install -r requirements.txt
+flask db upgrade  # Apply database migrations
+flask run  # Start backend server
 
-```bash
-flask run
-```
+3️⃣ Frontend Setup (React.js)
 
----
+cd ../Frontend
+npm install
+npm run dev
 
-## Endpoints
+4️⃣ Open in Browser
 
-### Authentication
+Frontend: http://localhost:5173
+Backend: http://127.0.0.1:5000
 
-1. **Login**
-   - **POST** `/auth/login`
-   - Request body:
+## 🔑 API Endpoints
 
-     ```json
-     {
-       "email": "user@example.com",
-       "password": "password123"
-     }
-     ```
+Authentication
 
-2. **Register**
-   - **POST** `/auth/register`
-   - Request body:
+POST /register - Register a new user
 
-     ```json
-     {
-       "email": "user@example.com",
-       "password": "password123"
-     }
-     ```
+POST /login - Authenticate user and receive a token
 
----
+POST /logout - Logout and revoke token
 
-### Books Management
+Books
 
-1. **Add a Book**
-   - **POST** `/books`
-   - Request body:
+GET /books - Fetch all books
 
-     ```json
-     {
-       "Title": "Book Title",
-       "Genre": "Fiction",
-       "borrowed_at": "2025-01-01",
-       "returned_at": "2025-01-15"
-     }
-     ```
+POST /books - Add a new book (Admin Only)
 
-2. **Get All Books**
-   - **GET** `/books`
+PATCH /books/:id - Update book details (Admin Only)
 
-3. **Get a Specific Book**
-   - **GET** `/books/<book_id>`
+DELETE /books/:id - Delete a book (Admin Only)
 
-4. **Update a Book**
-   - **PATCH** `/books/<book_id>`
-   - Request body:
+PUT /books/:id/borrow - Rent a book
 
-     ```json
-     {
-       "Title": "Updated Title",
-       "Genre": "Updated Genre",
-       "borrowed_at": "2025-01-02",
-       "returned_at": "2025-01-16"
-     }
-     ```
+PUT /books/:id/return - Return a rented book
 
-5. **Delete a Book**
-   - **DELETE** `/books/<book_id>`
+## 🛑 Known Issues
 
----
+❌ Renting & Returning Books: Some users face errors while renting and returning books. Fixing backend database models is required.❌ Notifications: Currently, there is no feature to notify users about due dates.
 
-## Error Handling
+## 🤝 Contributing
 
-The API returns appropriate error messages and HTTP status codes for invalid requests, including:
+Fork the repository
 
-- Unauthorized access (401)
-- Book not found (404)
-- Validation errors (400)
+Create a new branch: (git checkout -b feature-branch)
 
----
+Commit your changes: (git commit -m 'Added a new feature')
 
-## Dependencies
+Push to the branch: (git push origin feature-branch)
 
-- Flask
-- Flask-JWT-Extended
-- Flask-SQLAlchemy
-- pipenv
+Open a Pull Request
 
-Install them using:
+## 📜 License
 
-```bash
-pipenv install flask flask-jwt-extended flask-sqlalchemy
-```
+This project is licensed under the MIT License. Feel free to use and modify it.
 
----
+## 🙌 Acknowledgements
 
-## Contributing
-
-Contributions are welcome! Fork the repository, make changes, and submit a pull request.
-
----
-
-## License
-
-This project is licensed under the MIT License.
+Thanks to everyone who contributed to the development of this project! 😊
 
