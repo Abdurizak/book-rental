@@ -14,7 +14,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Database Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://librarydb_gjqx_user:C92iwd7qqr2BvU0qFqd4ZDp8IJzppNoX@dpg-cufn7a2n91rc73ci2ni0-a.oregon-postgres.render.com/librarydb_gjqx'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
