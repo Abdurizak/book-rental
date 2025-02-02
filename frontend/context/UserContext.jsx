@@ -15,7 +15,7 @@ export const UserProvider = ({ children }) => {
   const addUser = async (username, email, password, grade, role) => {
     try {
       toast.loading("Adding User...");
-      const response = await fetch("http://127.0.0.1:5000/users", {
+      const response = await fetch("https://book-rental-bgfr.onrender.com/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password, grade, role }),
@@ -38,7 +38,7 @@ export const UserProvider = ({ children }) => {
   const login = async (email, password, role) => {
     try {
       toast.loading("Logging you in...");
-      const response = await fetch("http://127.0.0.1:5000/login", {
+      const response = await fetch("https://book-rental-bgfr.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
