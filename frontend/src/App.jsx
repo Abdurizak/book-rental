@@ -9,7 +9,7 @@ import UserDashboard from "./Components/UserDashboard";
 import AdminDashboard from "./Components/AdminDashboard";
 import { UserProvider, UserContext } from "../context/UserContext";
 import { BooksProvider } from "../context/BooksContext";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const ProtectedRoute = ({ element, role }) => {
   const { currentUser } = useContext(UserContext);
